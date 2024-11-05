@@ -69,53 +69,55 @@ class _SelectionDialogState extends State<SelectionDialog> {
   late List<CountryCode> filteredElements;
 
   @override
-  Widget build(BuildContext context) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          if (!widget.hideSearch)
-            Padding(
-              padding: widget.searchPadding,
-              child: TextField(
-                style: widget.searchStyle,
-                decoration: widget.searchDecoration,
-                onChanged: _filterElements,
+  Widget build(BuildContext context) => Expanded(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            if (!widget.hideSearch)
+              Padding(
+                padding: widget.searchPadding,
+                child: TextField(
+                  style: widget.searchStyle,
+                  decoration: widget.searchDecoration,
+                  onChanged: _filterElements,
+                ),
+              ),
+            Expanded(
+              child: ListView(
+                children: [
+                  widget.favoriteElements.isEmpty
+                      ? const DecoratedBox(decoration: BoxDecoration())
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ...widget.favoriteElements.map((f) => InkWell(
+                                onTap: () {
+                                  _selectItem(f);
+                                },
+                                child: Padding(
+                                  padding: widget.dialogItemPadding,
+                                  child: _buildOption(f),
+                                ))),
+                            const Divider(),
+                          ],
+                        ),
+                  if (filteredElements.isEmpty)
+                    _buildEmptySearchWidget(context)
+                  else
+                    ...filteredElements.map((e) => InkWell(
+                        onTap: () {
+                          _selectItem(e);
+                        },
+                        child: Padding(
+                          padding: widget.dialogItemPadding,
+                          child: _buildOption(e),
+                        ))),
+                ],
               ),
             ),
-          Expanded(
-            child: ListView(
-              children: [
-                widget.favoriteElements.isEmpty
-                    ? const DecoratedBox(decoration: BoxDecoration())
-                    : Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ...widget.favoriteElements.map((f) => InkWell(
-                              onTap: () {
-                                _selectItem(f);
-                              },
-                              child: Padding(
-                                padding: widget.dialogItemPadding,
-                                child: _buildOption(f),
-                              ))),
-                          const Divider(),
-                        ],
-                      ),
-                if (filteredElements.isEmpty)
-                  _buildEmptySearchWidget(context)
-                else
-                  ...filteredElements.map((e) => InkWell(
-                      onTap: () {
-                        _selectItem(e);
-                      },
-                      child: Padding(
-                        padding: widget.dialogItemPadding,
-                        child: _buildOption(e),
-                      ))),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       );
 
   Widget _buildOption(CountryCode e) {
